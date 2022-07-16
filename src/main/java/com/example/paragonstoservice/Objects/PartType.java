@@ -4,7 +4,7 @@ import lombok.Value;
 
 @Value
 public class PartType {
-    private Long id;
+    Long id;
 
-    private String name;
+    String name;
 }

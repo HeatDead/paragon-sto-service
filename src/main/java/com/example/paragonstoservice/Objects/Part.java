@@ -4,17 +4,15 @@ import lombok.Value;
 
 @Value
 public class Part {
-    private Long id;
+    Long id;
 
-    private Long order_id;
-    private Long brand_id;
-    private Long model_id;
+    String name;
+    Long brand_id;
+    Long model_id;
 
-    private Double price;
+    Double price;
 
-    private PartType type;
+    PartType type;
 
-    private boolean used;
-
-    private Work work;
+    Work work;
 }

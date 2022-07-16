@@ -4,11 +4,11 @@ import lombok.Value;
 
 @Value
 public class Work {
-    private Long id;
+    Long id;
 
-    private Long order_id;
+    Long order_id;
 
-    private String description;
+    String description;
 
-    private Double price;
+    Double price;
 }

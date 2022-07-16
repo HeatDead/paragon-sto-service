@@ -8,6 +8,7 @@ import com.example.paragonstoservice.Objects.Part;
 import com.example.paragonstoservice.Objects.PartType;
 import com.example.paragonstoservice.Repositories.PartRepository;
 import com.example.paragonstoservice.Repositories.PartTypeRepository;
+import com.example.paragonstoservice.Requests.OrderPartRequest;
 import com.example.paragonstoservice.Requests.PartRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,13 +42,21 @@ public class DefaultPartsService implements PartsService{
             return;//ex
         PartEntity entity = new PartEntity();
 
-        entity.setOrder_id(request.getOrder());
+        entity.setName(request.getName());
         entity.setBrand_id(request.getBrand());
         entity.setModel_id(request.getModel());
+        entity.setPrice(request.getPrice());
         entity.setTypeEntity(partTypeRepository.findById(request.getType()).get());
-        entity.setUsed(false);
+        entity.setCount(0);
 
         partRepository.save(entity);
+    }
+
+    @Override
+    public void orderPart(OrderPartRequest orderPartRequest) {
+        PartEntity partEntity = partRepository.findById(orderPartRequest.getId()).get();
+        partEntity.setCount(partEntity.getCount() + orderPartRequest.getCount());
+        partRepository.save(partEntity);
     }
 
     @Override
@@ -70,5 +79,10 @@ public class DefaultPartsService implements PartsService{
             parts.add(partToEntityMapper.partEntityToPart(entity));
 
         return parts;
+    }
+
+    @Override
+    public Part getPartById(Long id) {
+        return partToEntityMapper.partEntityToPart(partRepository.findById(id).get());
     }
 }

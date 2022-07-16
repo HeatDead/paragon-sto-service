@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PartRequest {
-    Long order;
+    String name;
 
     Long brand;
     Long model;

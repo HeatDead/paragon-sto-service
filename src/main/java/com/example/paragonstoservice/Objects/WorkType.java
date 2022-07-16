@@ -4,7 +4,7 @@ import lombok.Value;
 
 @Value
 public class WorkType {
-    private Long id;
+    Long id;
 
-    private String name;
+    String name;
 }
