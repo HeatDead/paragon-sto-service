@@ -32,7 +32,7 @@ public class WorksController {
     }
 
     @PostMapping
-    public void addWork(WorkRequest workRequest){
+    public void addWork(@RequestBody WorkRequest workRequest){
 
     }
 }

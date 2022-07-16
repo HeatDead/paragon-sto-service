@@ -33,7 +33,7 @@ public class PartsController {
 
     //Запрос микросервиса
     @PostMapping
-    public void addPart(PartRequest partRequest){
-
+    public void addPart(@RequestBody PartRequest partRequest){
+        partsService.addPart(partRequest);
     }
 }
