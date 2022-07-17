@@ -14,5 +14,5 @@ public class Part {
 
     PartType type;
 
-    Work work;
+    int count;
 }
