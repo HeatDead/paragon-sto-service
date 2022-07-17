@@ -11,4 +11,5 @@ public class Work {
     String description;
 
     Double price;
+    Double total_price;
 }

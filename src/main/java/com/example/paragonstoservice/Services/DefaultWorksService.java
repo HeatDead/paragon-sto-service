@@ -8,6 +8,7 @@ import com.example.paragonstoservice.Mappers.WorkTypeToEntityMapper;
 import com.example.paragonstoservice.Objects.Part;
 import com.example.paragonstoservice.Objects.Work;
 import com.example.paragonstoservice.Objects.WorkType;
+import com.example.paragonstoservice.Repositories.PartRepository;
 import com.example.paragonstoservice.Repositories.WorkRepository;
 import com.example.paragonstoservice.Repositories.WorkTypeRepository;
 import com.example.paragonstoservice.Requests.WorkRequest;
@@ -22,6 +23,7 @@ import java.util.List;
 public class DefaultWorksService implements WorksService{
     private final WorkTypeRepository workTypeRepository;
     private final WorkRepository workRepository;
+    private final PartRepository partRepository;
 
     private final WorkToEntityMapper workToEntityMapper;
     private final WorkTypeToEntityMapper workTypeToEntityMapper;
@@ -43,11 +45,19 @@ public class DefaultWorksService implements WorksService{
         if (request == null)
             return;//ex
 
+        //TO DO: добавить проверку заказа
         WorkEntity entity = new WorkEntity();
 
         entity.setOrder_id(request.getOrder());
         entity.setWork_desc(request.getDescription());
-        entity.setWork_price(request.getPrice());
+        entity.setWork_price(request.getWork_price());
+
+        Double parts_price = 0.0;
+        for (int i = 0; i < request.getUsed_parts().size(); i++){
+            parts_price += partRepository.findById(request.getUsed_parts().get(i)).get().getPrice();
+        }
+
+        entity.setTotal_price(entity.getWork_price() + parts_price);
 
         workRepository.save(entity);
     }

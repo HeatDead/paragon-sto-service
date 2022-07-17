@@ -33,6 +33,6 @@ public class WorksController {
 
     @PostMapping
     public void addWork(@RequestBody WorkRequest workRequest){
-
+        worksService.addWork(workRequest);
     }
 }

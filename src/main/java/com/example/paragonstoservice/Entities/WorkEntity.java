@@ -21,4 +21,5 @@ public class WorkEntity {
     private String work_desc;
 
     private Double work_price;
+    private Double total_price;
 }
