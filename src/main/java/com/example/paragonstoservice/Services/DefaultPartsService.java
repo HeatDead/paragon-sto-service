@@ -85,4 +85,17 @@ public class DefaultPartsService implements PartsService{
     public Part getPartById(Long id) {
         return partToEntityMapper.partEntityToPart(partRepository.findById(id).get());
     }
+
+    @Override
+    public List<Part> getPartByType(Long id) {
+        PartTypeEntity typeEntity = partTypeRepository.findById(id).get();
+
+        Iterable<PartEntity> iterable = partRepository.findByTypeEntity(typeEntity);
+
+        List<Part> parts = new ArrayList<>();
+        for (PartEntity entity : iterable)
+            parts.add(partToEntityMapper.partEntityToPart(entity));
+
+        return parts;
+    }
 }

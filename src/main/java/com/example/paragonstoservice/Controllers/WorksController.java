@@ -16,22 +16,22 @@ import java.util.List;
 public class WorksController {
     private final WorksService worksService;
 
-    @PostMapping("/types")
+    @PostMapping("/addType")
     public void addWorkType(@RequestParam String name){
         worksService.addWorkType(name);
     }
 
-    @GetMapping("/types")
+    @GetMapping("/getTypes")
     public List<WorkType> getWorksTypes(){
         return worksService.getAllWorksTypes();
     }
 
-    @GetMapping
+    @GetMapping("/getWorksById")
     public List<Work> getWorksByOrderId(@RequestParam Long order_id){
         return worksService.getAllWorksByOrderId(order_id);
     }
 
-    @PostMapping
+    @PostMapping("/addWork")
     public void addWork(@RequestBody WorkRequest workRequest){
         worksService.addWork(workRequest);
     }

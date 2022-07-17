@@ -14,4 +14,5 @@ public interface PartsService {
     List<PartType> getAllPartsTypes();
     List<Part> getAllParts();
     Part getPartById(Long id);
+    List<Part> getPartByType(Long id);
 }

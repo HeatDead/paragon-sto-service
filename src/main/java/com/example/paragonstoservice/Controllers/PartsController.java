@@ -17,12 +17,12 @@ import java.util.List;
 public class PartsController {
     private final PartsService partsService;
 
-    @PostMapping("/types")
+    @PostMapping("/addType")
     public void addPartType(@RequestParam String name){
         partsService.addPartType(name);
     }
 
-    @GetMapping("/types")
+    @GetMapping("/getAllTypes")
     public List<PartType> getAllPartsTypes(){
         return partsService.getAllPartsTypes();
     }
@@ -32,12 +32,17 @@ public class PartsController {
         return partsService.getAllParts();
     }
 
-    @GetMapping
+    @GetMapping("/getPartById")
     public Part getPartById(@RequestParam Long id){
         return partsService.getPartById(id);
     }
 
-    @PostMapping
+    @GetMapping("/getPartByType")
+    public List<Part> getPartByType(@RequestParam Long id){
+        return partsService.getPartByType(id);
+    }
+
+    @PostMapping("/addPart")
     public void addPart(@RequestBody PartRequest partRequest){
         partsService.addPart(partRequest);
     }
