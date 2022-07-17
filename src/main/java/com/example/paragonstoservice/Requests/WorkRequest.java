@@ -10,7 +10,7 @@ public class WorkRequest {
 
     String description;
 
-    List<Long> used_parts;
+    List<WorkPartRequest> used_parts;
 
     Double work_price;
 }

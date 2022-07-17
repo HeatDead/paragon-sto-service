@@ -52,9 +52,11 @@ public class DefaultWorksService implements WorksService{
         entity.setWork_desc(request.getDescription());
         entity.setWork_price(request.getWork_price());
 
+        System.out.println(request.getUsed_parts());
+
         Double parts_price = 0.0;
         for (int i = 0; i < request.getUsed_parts().size(); i++){
-            parts_price += partRepository.findById(request.getUsed_parts().get(i)).get().getPrice();
+            parts_price += partRepository.findById(request.getUsed_parts().get(i).getPart_id()).get().getPrice();
         }
 
         entity.setTotal_price(entity.getWork_price() + parts_price);
