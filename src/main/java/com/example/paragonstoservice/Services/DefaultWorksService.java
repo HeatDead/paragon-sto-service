@@ -121,6 +121,8 @@ public class DefaultWorksService implements WorksService{
                 usedParts.add(usedPartsToEntityMapper.usedPartsEntityToUsedParts(upEntity));
             }
 
+            w.setDescription(entity.getWork_desc());
+            w.setPrice(entity.getWork_price());
             w.setUsed_parts(usedParts);
             works.add(w);
         }
