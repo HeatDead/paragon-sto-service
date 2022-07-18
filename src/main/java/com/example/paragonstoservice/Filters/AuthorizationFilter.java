@@ -32,7 +32,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private static final List<String> ADMIN_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
     private static final List<String> MODERATOR_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
     private static final List<String> WORKER_WHITELIST = Arrays.asList("/works/addWork");
-    private static final List<String> MSERVICE_WHITELIST = Arrays.asList("/parts/order");
+    private static final List<String> MSERVICE_WHITELIST = Arrays.asList("/parts/order", "/works/getWorksById");
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request)
@@ -53,6 +53,11 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     protected boolean workerFilter(HttpServletRequest request)
             throws ServletException {
         return WORKER_WHITELIST.stream().anyMatch(p -> pathMatcher.match(p, request.getRequestURI()));
+    }
+
+    protected boolean microserviceFilter(HttpServletRequest request)
+            throws ServletException {
+        return MSERVICE_WHITELIST.stream().anyMatch(p -> pathMatcher.match(p, request.getRequestURI()));
     }
 
     @Override
@@ -89,6 +94,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             }else if(workerFilter(request)) {
                 System.out.println("WORKER REQUEST");
                 if (tokenService.checkRole(token).equals("WORKER"))
+                    filterChain.doFilter(request, response);
+                else
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            }else if(microserviceFilter(request)) {
+                System.out.println("MICROSERVICE REQUEST");
+                if (tokenService.checkRole(token).equals("MICROSERVICE"))
                     filterChain.doFilter(request, response);
                 else
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
