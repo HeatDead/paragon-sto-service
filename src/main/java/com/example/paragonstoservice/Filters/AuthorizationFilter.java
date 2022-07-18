@@ -31,7 +31,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
     private static final List<String> ADMIN_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
     private static final List<String> MODERATOR_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
-    private static final List<String> WORKER_WHITELIST = Arrays.asList("/works/addWork");
+    private static final List<String> WORKER_WHITELIST = Arrays.asList("/works/addWork", "/works/getWorksById");
     private static final List<String> MSERVICE_WHITELIST = Arrays.asList("/parts/order", "/works/getWorksById");
 
     @Override
@@ -77,34 +77,37 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         else if (!checkAuthorization(authHeader)) {
             System.out.println("SC_FORBIDDEN");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        } else {
+        }
+        else {
             String token = authHeader.substring(7);
             if(adminFilter(request)) {
                 System.out.println("ADMIN REQUEST");
                 if (tokenService.checkRole(token).equals("ADMIN"))
                     filterChain.doFilter(request, response);
-                else
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }else if(moderatorFilter(request)) {
+                //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            }
+            if(moderatorFilter(request)) {
                 System.out.println("MODERATOR REQUEST");
                 if (tokenService.checkRole(token).equals("MODERATOR"))
                     filterChain.doFilter(request, response);
-                else
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }else if(workerFilter(request)) {
+            }
+            if (workerFilter(request)) {
                 System.out.println("WORKER REQUEST");
                 if (tokenService.checkRole(token).equals("WORKER"))
                     filterChain.doFilter(request, response);
-                else
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }else if(microserviceFilter(request)) {
+            }
+            if (microserviceFilter(request)) {
                 System.out.println("MICROSERVICE REQUEST");
                 if (tokenService.checkRole(token).equals("MICROSERVICE"))
                     filterChain.doFilter(request, response);
-                else
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }else
+            }
+
+            if (!microserviceFilter(request) && !workerFilter(request) && !moderatorFilter(request) && !adminFilter(request)) {
                 filterChain.doFilter(request, response);
+                return;
+            }
+
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
