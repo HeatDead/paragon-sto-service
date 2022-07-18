@@ -1,14 +1,19 @@
 package com.example.paragonstoservice.Services;
 
 import com.example.paragonstoservice.Entities.PartEntity;
+import com.example.paragonstoservice.Entities.UsedPartsEntity;
 import com.example.paragonstoservice.Entities.WorkEntity;
 import com.example.paragonstoservice.Entities.WorkTypeEntity;
+import com.example.paragonstoservice.Mappers.PartToEntityMapper;
+import com.example.paragonstoservice.Mappers.UsedPartsToEntityMapper;
 import com.example.paragonstoservice.Mappers.WorkToEntityMapper;
 import com.example.paragonstoservice.Mappers.WorkTypeToEntityMapper;
 import com.example.paragonstoservice.Objects.Part;
+import com.example.paragonstoservice.Objects.UsedPart;
 import com.example.paragonstoservice.Objects.Work;
 import com.example.paragonstoservice.Objects.WorkType;
 import com.example.paragonstoservice.Repositories.PartRepository;
+import com.example.paragonstoservice.Repositories.UsedPartsRepository;
 import com.example.paragonstoservice.Repositories.WorkRepository;
 import com.example.paragonstoservice.Repositories.WorkTypeRepository;
 import com.example.paragonstoservice.Requests.WorkRequest;
@@ -24,9 +29,12 @@ public class DefaultWorksService implements WorksService{
     private final WorkTypeRepository workTypeRepository;
     private final WorkRepository workRepository;
     private final PartRepository partRepository;
+    private final UsedPartsRepository usedPartsRepository;
 
     private final WorkToEntityMapper workToEntityMapper;
     private final WorkTypeToEntityMapper workTypeToEntityMapper;
+    private final UsedPartsToEntityMapper usedPartsToEntityMapper;
+    private final PartToEntityMapper partToEntityMapper;
 
     @Override
     public void addWorkType(String name) {
@@ -52,6 +60,8 @@ public class DefaultWorksService implements WorksService{
         entity.setWork_desc(request.getDescription());
         entity.setWork_price(request.getWork_price());
 
+        entity = workRepository.save(entity);
+
         System.out.println(request.getUsed_parts());
 
         Double parts_price = 0.0;
@@ -61,6 +71,13 @@ public class DefaultWorksService implements WorksService{
 
             parts_price += partEntity.getPrice() * count;
             partEntity.setCount(partEntity.getCount() - count);
+
+            UsedPartsEntity usedPartsEntity = new UsedPartsEntity();
+            usedPartsEntity.setWork_id(entity.getId());
+            usedPartsEntity.setPart_id(partEntity.getId());
+            usedPartsEntity.setCount(count);
+
+            usedPartsRepository.save(usedPartsEntity);
         }
 
         entity.setTotal_price(entity.getWork_price() + parts_price);
@@ -86,8 +103,27 @@ public class DefaultWorksService implements WorksService{
         Iterable<WorkEntity> iterable = workRepository.findAllByOrderId(id);
 
         List<Work> works = new ArrayList<>();
-        for (WorkEntity entity : iterable)
-            works.add(workToEntityMapper.workEntityToWork(entity));
+        for (WorkEntity entity : iterable) {
+            Work w = workToEntityMapper.workEntityToWork(entity);
+
+            Iterable upIterable = usedPartsRepository.findAllByWork_id(w.getId());
+
+            List<UsedPart> usedParts = new ArrayList<>();
+            for (var usedPartsEntity : upIterable) {
+                UsedPartsEntity upEntity = (UsedPartsEntity)usedPartsEntity;
+
+                Part p = partToEntityMapper.partEntityToPart(partRepository.findById(upEntity.getPart_id()).get());
+                upEntity.setName(p.getName());
+                upEntity.setBrand_id(p.getBrand_id());
+                upEntity.setModel_id(p.getModel_id());
+                upEntity.setPrice(p.getPrice());
+
+                usedParts.add(usedPartsToEntityMapper.usedPartsEntityToUsedParts(upEntity));
+            }
+
+            w.setUsed_parts(usedParts);
+            works.add(w);
+        }
 
         return works;
     }
