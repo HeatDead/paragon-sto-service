@@ -66,7 +66,7 @@ public class DefaultWorksService implements WorksService{
 
         Double parts_price = 0.0;
         for (int i = 0; i < request.getUsed_parts().size(); i++){
-            PartEntity partEntity = partRepository.findById(request.getUsed_parts().get(i).getPart_id()).get();
+            PartEntity partEntity = partRepository.findById(request.getUsed_parts().get(i).getId()).get();
             int count = request.getUsed_parts().get(i).getCount();
 
             parts_price += partEntity.getPrice() * count;

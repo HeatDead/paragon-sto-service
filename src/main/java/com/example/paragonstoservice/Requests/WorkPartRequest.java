@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class WorkPartRequest {
-    Long part_id;
+    Long id;
     int count;
 }
