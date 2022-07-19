@@ -1,5 +1,6 @@
 package com.example.paragonstoservice.Controllers;
 
+import com.example.paragonstoservice.Exceptions.ObjectNotFoundException;
 import com.example.paragonstoservice.Objects.Part;
 import com.example.paragonstoservice.Objects.PartType;
 import com.example.paragonstoservice.Requests.OrderPartRequest;
@@ -33,23 +34,23 @@ public class PartsController {
     }
 
     @GetMapping("/getPartById")
-    public Part getPartById(@RequestParam Long id){
+    public Part getPartById(@RequestParam Long id) throws ObjectNotFoundException{
         return partsService.getPartById(id);
     }
 
     @GetMapping("/getPartByType")
-    public List<Part> getPartByType(@RequestParam Long id){
+    public List<Part> getPartByType(@RequestParam Long id) throws ObjectNotFoundException{
         return partsService.getPartByType(id);
     }
 
     @PostMapping("/addPart")
-    public void addPart(@RequestBody PartRequest partRequest){
+    public void addPart(@RequestBody PartRequest partRequest) throws ObjectNotFoundException{
         partsService.addPart(partRequest);
     }
 
     //Запрос микросервиса
     @PostMapping("/order")
-    public void orderPart(@RequestBody OrderPartRequest orderPartRequest){
+    public void orderPart(@RequestBody OrderPartRequest orderPartRequest) throws ObjectNotFoundException {
         partsService.orderPart(orderPartRequest);
     }
 }

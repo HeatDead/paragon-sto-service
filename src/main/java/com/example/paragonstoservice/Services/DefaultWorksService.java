@@ -4,6 +4,7 @@ import com.example.paragonstoservice.Entities.PartEntity;
 import com.example.paragonstoservice.Entities.UsedPartsEntity;
 import com.example.paragonstoservice.Entities.WorkEntity;
 import com.example.paragonstoservice.Entities.WorkTypeEntity;
+import com.example.paragonstoservice.Exceptions.ObjectNotFoundException;
 import com.example.paragonstoservice.Mappers.PartToEntityMapper;
 import com.example.paragonstoservice.Mappers.UsedPartsToEntityMapper;
 import com.example.paragonstoservice.Mappers.WorkToEntityMapper;
@@ -38,8 +39,8 @@ public class DefaultWorksService implements WorksService{
 
     @Override
     public void addWorkType(String name) {
-        if (name == null)
-            return;//ex
+        if (name.equals(""))
+            throw new IllegalArgumentException("Incorrect name");
 
         WorkTypeEntity entity = new WorkTypeEntity();
 
@@ -49,11 +50,11 @@ public class DefaultWorksService implements WorksService{
     }
 
     @Override
-    public void addWork(WorkRequest request) {
+    public void addWork(WorkRequest request) throws ObjectNotFoundException {
         if (request == null)
-            return;//ex
+            throw new IllegalArgumentException("Incorrect name");
 
-        //TO DO: добавить проверку заказа
+        //TODO: добавить проверку заказа
         WorkEntity entity = new WorkEntity();
 
         entity.setOrder_id(request.getOrder());
@@ -66,7 +67,9 @@ public class DefaultWorksService implements WorksService{
 
         Double parts_price = 0.0;
         for (int i = 0; i < request.getUsed_parts().size(); i++){
-            PartEntity partEntity = partRepository.findById(request.getUsed_parts().get(i).getId()).get();
+            PartEntity partEntity = partRepository.findById(request.getUsed_parts().get(i).getId())
+                    .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found"));
+
             int count = request.getUsed_parts().get(i).getCount();
 
             parts_price += partEntity.getPrice() * count;
@@ -97,9 +100,9 @@ public class DefaultWorksService implements WorksService{
     }
 
     @Override
-    public List<Work> getAllWorksByOrderId(Long id) {
+    public List<Work> getAllWorksByOrderId(Long id) throws ObjectNotFoundException {
         if (id == null)
-            return null;//ex
+            throw new IllegalArgumentException("Incorrect name");
         Iterable<WorkEntity> iterable = workRepository.findAllByOrderId(id);
 
         List<Work> works = new ArrayList<>();
@@ -112,7 +115,8 @@ public class DefaultWorksService implements WorksService{
             for (var usedPartsEntity : upIterable) {
                 UsedPartsEntity upEntity = (UsedPartsEntity)usedPartsEntity;
 
-                Part p = partToEntityMapper.partEntityToPart(partRepository.findById(upEntity.getPart_id()).get());
+                Part p = partToEntityMapper.partEntityToPart(partRepository.findById(upEntity.getPart_id())
+                        .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found")));
                 upEntity.setName(p.getName());
                 upEntity.setBrand_id(p.getBrand_id());
                 upEntity.setModel_id(p.getModel_id());

@@ -1,5 +1,6 @@
 package com.example.paragonstoservice.Controllers;
 
+import com.example.paragonstoservice.Exceptions.ObjectNotFoundException;
 import com.example.paragonstoservice.Objects.Work;
 import com.example.paragonstoservice.Objects.WorkType;
 import com.example.paragonstoservice.Requests.WorkRequest;
@@ -27,12 +28,12 @@ public class WorksController {
     }
 
     @GetMapping("/getWorksById")
-    public List<Work> getWorksByOrderId(@RequestParam Long order_id){
+    public List<Work> getWorksByOrderId(@RequestParam Long order_id) throws ObjectNotFoundException {
         return worksService.getAllWorksByOrderId(order_id);
     }
 
     @PostMapping("/addWork")
-    public void addWork(@RequestBody WorkRequest workRequest){
+    public void addWork(@RequestBody WorkRequest workRequest) throws ObjectNotFoundException{
         worksService.addWork(workRequest);
     }
 }

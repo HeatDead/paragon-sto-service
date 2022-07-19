@@ -2,6 +2,7 @@ package com.example.paragonstoservice.Services;
 
 import com.example.paragonstoservice.Entities.PartEntity;
 import com.example.paragonstoservice.Entities.PartTypeEntity;
+import com.example.paragonstoservice.Exceptions.ObjectNotFoundException;
 import com.example.paragonstoservice.Mappers.PartToEntityMapper;
 import com.example.paragonstoservice.Mappers.PartTypeToEntityMapper;
 import com.example.paragonstoservice.Objects.Part;
@@ -27,8 +28,9 @@ public class DefaultPartsService implements PartsService{
 
     @Override
     public void addPartType(String name) {
-        if (name == null)
-            return;//ex
+        if (name.equals(""))
+            throw new IllegalArgumentException("Incorrect name");
+
         PartTypeEntity entity = new PartTypeEntity();
 
         entity.setName(name);
@@ -37,24 +39,27 @@ public class DefaultPartsService implements PartsService{
     }
 
     @Override
-    public void addPart(PartRequest request) {
+    public void addPart(PartRequest request) throws ObjectNotFoundException {
         if (request == null)
-            return;//ex
+            throw new IllegalArgumentException("Incorrect request");
+
         PartEntity entity = new PartEntity();
 
         entity.setName(request.getName());
         entity.setBrand_id(request.getBrand());
         entity.setModel_id(request.getModel());
         entity.setPrice(request.getPrice());
-        entity.setTypeEntity(partTypeRepository.findById(request.getType()).get());
+        entity.setTypeEntity(partTypeRepository.findById(request.getType())
+                .orElseThrow(()-> new ObjectNotFoundException("Part type with this id not found")));
         entity.setCount(0);
 
         partRepository.save(entity);
     }
 
     @Override
-    public void orderPart(OrderPartRequest orderPartRequest) {
-        PartEntity partEntity = partRepository.findById(orderPartRequest.getId()).get();
+    public void orderPart(OrderPartRequest orderPartRequest) throws ObjectNotFoundException {
+        PartEntity partEntity = partRepository.findById(orderPartRequest.getId())
+                .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found"));
         partEntity.setCount(partEntity.getCount() + orderPartRequest.getCount());
         partRepository.save(partEntity);
     }
@@ -82,13 +87,15 @@ public class DefaultPartsService implements PartsService{
     }
 
     @Override
-    public Part getPartById(Long id) {
-        return partToEntityMapper.partEntityToPart(partRepository.findById(id).get());
+    public Part getPartById(Long id) throws ObjectNotFoundException {
+        return partToEntityMapper.partEntityToPart(partRepository.findById(id)
+                .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found")));
     }
 
     @Override
-    public List<Part> getPartByType(Long id) {
-        PartTypeEntity typeEntity = partTypeRepository.findById(id).get();
+    public List<Part> getPartByType(Long id) throws ObjectNotFoundException {
+        PartTypeEntity typeEntity = partTypeRepository.findById(id)
+                .orElseThrow(()-> new ObjectNotFoundException("Part type with this id not found"));
 
         Iterable<PartEntity> iterable = partRepository.findByTypeEntity(typeEntity);
 

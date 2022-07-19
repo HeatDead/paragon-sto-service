@@ -84,7 +84,6 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 System.out.println("ADMIN REQUEST");
                 if (tokenService.checkRole(token).equals("ADMIN"))
                     filterChain.doFilter(request, response);
-                //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
             if(moderatorFilter(request)) {
                 System.out.println("MODERATOR REQUEST");
