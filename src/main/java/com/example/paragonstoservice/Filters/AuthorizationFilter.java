@@ -31,8 +31,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
     private static final List<String> ADMIN_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
     private static final List<String> MODERATOR_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
-    private static final List<String> WORKER_WHITELIST = Arrays.asList("/works/addWork", "/works/getWorksById");
-    private static final List<String> MSERVICE_WHITELIST = Arrays.asList("/parts/order", "/works/getWorksById");
+    private static final List<String> WORKER_WHITELIST = Arrays.asList("/works/addWork");
+    private static final List<String> MSERVICE_WHITELIST = Arrays.asList("/parts/order");
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request)
