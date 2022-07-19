@@ -18,38 +18,38 @@ import java.util.List;
 public class PartsController {
     private final PartsService partsService;
 
-    @PostMapping("/addType")
+    @RequestMapping(value = "/addType", method = RequestMethod.POST)
     public void addPartType(@RequestParam String name){
         partsService.addPartType(name);
     }
 
-    @GetMapping("/getAllTypes")
+    @RequestMapping(value = "/getAllTypes", method = RequestMethod.GET)
     public List<PartType> getAllPartsTypes(){
         return partsService.getAllPartsTypes();
     }
 
-    @GetMapping("/allParts")
+    @RequestMapping(value = "/allParts", method = RequestMethod.GET)
     public List<Part> getAllParts(){
         return partsService.getAllParts();
     }
 
-    @GetMapping("/getPartById")
+    @RequestMapping(value = "/getPartById", method = RequestMethod.GET)
     public Part getPartById(@RequestParam Long id) throws ObjectNotFoundException{
         return partsService.getPartById(id);
     }
 
-    @GetMapping("/getPartByType")
+    @RequestMapping(value = "/getPartByType", method = RequestMethod.GET)
     public List<Part> getPartByType(@RequestParam Long id) throws ObjectNotFoundException{
         return partsService.getPartByType(id);
     }
 
-    @PostMapping("/addPart")
+    @RequestMapping(value = "/addPart", method = RequestMethod.POST)
     public void addPart(@RequestBody PartRequest partRequest) throws ObjectNotFoundException{
         partsService.addPart(partRequest);
     }
 
     //Запрос микросервиса
-    @PostMapping("/order")
+    @RequestMapping(value = "/order", method = RequestMethod.POST)
     public void orderPart(@RequestBody OrderPartRequest orderPartRequest) throws ObjectNotFoundException {
         partsService.orderPart(orderPartRequest);
     }

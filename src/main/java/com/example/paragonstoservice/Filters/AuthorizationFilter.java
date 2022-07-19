@@ -27,7 +27,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
     private AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    private static final List<String> AUTH_WHITELIST = Arrays.asList();
+    private static final List<String> AUTH_WHITELIST = Arrays.asList("/swagger-ui/**", "/swagger-resources/**", "/v2/**");
 
     private static final List<String> ADMIN_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");
     private static final List<String> MODERATOR_WHITELIST = Arrays.asList("/works/addType", "/parts/addType", "/parts/addPart");

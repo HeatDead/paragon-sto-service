@@ -17,22 +17,22 @@ import java.util.List;
 public class WorksController {
     private final WorksService worksService;
 
-    @PostMapping("/addType")
+    @RequestMapping(value = "/addType", method = RequestMethod.POST)
     public void addWorkType(@RequestParam String name){
         worksService.addWorkType(name);
     }
 
-    @GetMapping("/getTypes")
+    @RequestMapping(value = "/getTypes", method = RequestMethod.GET)
     public List<WorkType> getWorksTypes(){
         return worksService.getAllWorksTypes();
     }
 
-    @GetMapping("/getWorksById")
+    @RequestMapping(value = "/getWorksById", method = RequestMethod.GET)
     public List<Work> getWorksByOrderId(@RequestParam Long order_id) throws ObjectNotFoundException {
         return worksService.getAllWorksByOrderId(order_id);
     }
 
-    @PostMapping("/addWork")
+    @RequestMapping(value = "/addWork", method = RequestMethod.POST)
     public void addWork(@RequestBody WorkRequest workRequest) throws ObjectNotFoundException{
         worksService.addWork(workRequest);
     }
