@@ -29,7 +29,7 @@ public class DefaultPartsService implements PartsService{
     @Override
     public void addPartType(String name) {
         if (name.equals(""))
-            throw new IllegalArgumentException("Incorrect name");
+            throw new IllegalArgumentException("Неверное имя");
 
         PartTypeEntity entity = new PartTypeEntity();
 
@@ -41,7 +41,10 @@ public class DefaultPartsService implements PartsService{
     @Override
     public void addPart(PartRequest request) throws ObjectNotFoundException {
         if (request == null)
-            throw new IllegalArgumentException("Incorrect request");
+            throw new IllegalArgumentException("Неверный запрос");
+
+        if(request.getName().equals(""))
+            throw new IllegalArgumentException("Неверный запрос");
 
         PartEntity entity = new PartEntity();
 
@@ -50,7 +53,7 @@ public class DefaultPartsService implements PartsService{
         entity.setModel_id(request.getModel());
         entity.setPrice(request.getPrice());
         entity.setTypeEntity(partTypeRepository.findById(request.getType())
-                .orElseThrow(()-> new ObjectNotFoundException("Part type with this id not found")));
+                .orElseThrow(()-> new ObjectNotFoundException("Тип запчасти с этим id не найден")));
         entity.setCount(0);
 
         partRepository.save(entity);
@@ -59,7 +62,7 @@ public class DefaultPartsService implements PartsService{
     @Override
     public void orderPart(OrderPartRequest orderPartRequest) throws ObjectNotFoundException {
         PartEntity partEntity = partRepository.findById(orderPartRequest.getId())
-                .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found"));
+                .orElseThrow(()-> new ObjectNotFoundException("Запчасть с этим id не найдена"));
         partEntity.setCount(partEntity.getCount() + orderPartRequest.getCount());
         partRepository.save(partEntity);
     }
@@ -89,13 +92,13 @@ public class DefaultPartsService implements PartsService{
     @Override
     public Part getPartById(Long id) throws ObjectNotFoundException {
         return partToEntityMapper.partEntityToPart(partRepository.findById(id)
-                .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found")));
+                .orElseThrow(()-> new ObjectNotFoundException("Запчасть с этим id не найдена")));
     }
 
     @Override
     public List<Part> getPartByType(Long id) throws ObjectNotFoundException {
         PartTypeEntity typeEntity = partTypeRepository.findById(id)
-                .orElseThrow(()-> new ObjectNotFoundException("Part type with this id not found"));
+                .orElseThrow(()-> new ObjectNotFoundException("Тип запчасти с этим id не найден"));
 
         Iterable<PartEntity> iterable = partRepository.findByTypeEntity(typeEntity);
 

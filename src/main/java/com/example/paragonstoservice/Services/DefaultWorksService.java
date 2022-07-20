@@ -17,6 +17,7 @@ import com.example.paragonstoservice.Repositories.PartRepository;
 import com.example.paragonstoservice.Repositories.UsedPartsRepository;
 import com.example.paragonstoservice.Repositories.WorkRepository;
 import com.example.paragonstoservice.Repositories.WorkTypeRepository;
+import com.example.paragonstoservice.Requests.WorkPartRequest;
 import com.example.paragonstoservice.Requests.WorkRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class DefaultWorksService implements WorksService{
     @Override
     public void addWorkType(String name) {
         if (name.equals(""))
-            throw new IllegalArgumentException("Incorrect name");
+            throw new IllegalArgumentException("Неверное имя");
 
         WorkTypeEntity entity = new WorkTypeEntity();
 
@@ -52,25 +53,31 @@ public class DefaultWorksService implements WorksService{
     @Override
     public void addWork(WorkRequest request) throws ObjectNotFoundException {
         if (request == null)
-            throw new IllegalArgumentException("Incorrect name");
+            throw new IllegalArgumentException("Неверный запрос");
 
-        //TODO: добавить проверку заказа
+        if(request.getDescription().equals(""))
+            throw new IllegalArgumentException("Неверный запрос");
+
         WorkEntity entity = new WorkEntity();
 
         entity.setOrder_id(request.getOrder());
         entity.setWork_desc(request.getDescription());
         entity.setWork_price(request.getWork_price());
 
+        for (WorkPartRequest usedPart : request.getUsed_parts()) {
+            PartEntity partEntity = partRepository.findById(usedPart.getId())
+                    .orElseThrow(() -> new ObjectNotFoundException("Запчасть с этим id не найдена"));
+            if (partEntity.getCount() < usedPart.getCount())
+                throw new IllegalArgumentException("Не хватает запчастей на складе");
+        }
+
         entity = workRepository.save(entity);
 
-        System.out.println(request.getUsed_parts());
-
         Double parts_price = 0.0;
-        for (int i = 0; i < request.getUsed_parts().size(); i++){
-            PartEntity partEntity = partRepository.findById(request.getUsed_parts().get(i).getId())
-                    .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found"));
+        for (WorkPartRequest usedPart : request.getUsed_parts()){
+            PartEntity partEntity = partRepository.findById(usedPart.getId()).get();
 
-            int count = request.getUsed_parts().get(i).getCount();
+            int count = usedPart.getCount();
 
             parts_price += partEntity.getPrice() * count;
             partEntity.setCount(partEntity.getCount() - count);
@@ -102,27 +109,27 @@ public class DefaultWorksService implements WorksService{
     @Override
     public List<Work> getAllWorksByOrderId(Long id) throws ObjectNotFoundException {
         if (id == null)
-            throw new IllegalArgumentException("Incorrect name");
+            throw new IllegalArgumentException("Неверный запрос");
+
         Iterable<WorkEntity> iterable = workRepository.findAllByOrderId(id);
 
         List<Work> works = new ArrayList<>();
         for (WorkEntity entity : iterable) {
             Work w = workToEntityMapper.workEntityToWork(entity);
 
-            Iterable upIterable = usedPartsRepository.findAllByWork_id(w.getId());
+            Iterable<UsedPartsEntity> upIterable = usedPartsRepository.findAllByWork_id(w.getId());
 
             List<UsedPart> usedParts = new ArrayList<>();
-            for (var usedPartsEntity : upIterable) {
-                UsedPartsEntity upEntity = (UsedPartsEntity)usedPartsEntity;
+            for (UsedPartsEntity usedPartsEntity : upIterable) {
 
-                Part p = partToEntityMapper.partEntityToPart(partRepository.findById(upEntity.getPart_id())
-                        .orElseThrow(()-> new ObjectNotFoundException("Part with this id not found")));
-                upEntity.setName(p.getName());
-                upEntity.setBrand_id(p.getBrand_id());
-                upEntity.setModel_id(p.getModel_id());
-                upEntity.setPrice(p.getPrice());
+                Part p = partToEntityMapper.partEntityToPart(partRepository.findById(usedPartsEntity.getPart_id())
+                        .orElseThrow(()-> new ObjectNotFoundException("Запчасть с этим id не найдена")));
+                usedPartsEntity.setName(p.getName());
+                usedPartsEntity.setBrand_id(p.getBrand_id());
+                usedPartsEntity.setModel_id(p.getModel_id());
+                usedPartsEntity.setPrice(p.getPrice());
 
-                usedParts.add(usedPartsToEntityMapper.usedPartsEntityToUsedParts(upEntity));
+                usedParts.add(usedPartsToEntityMapper.usedPartsEntityToUsedParts(usedPartsEntity));
             }
 
             w.setDescription(entity.getWork_desc());
