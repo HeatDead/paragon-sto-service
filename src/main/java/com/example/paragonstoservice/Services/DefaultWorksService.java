@@ -56,7 +56,7 @@ public class DefaultWorksService implements WorksService{
             throw new IllegalArgumentException("Неверный запрос");
 
         if(request.getDescription().equals(""))
-            throw new IllegalArgumentException("Неверный запрос");
+            throw new IllegalArgumentException("Описание не может быть пустым");
 
         WorkEntity entity = new WorkEntity();
 
@@ -67,6 +67,8 @@ public class DefaultWorksService implements WorksService{
         for (WorkPartRequest usedPart : request.getUsed_parts()) {
             PartEntity partEntity = partRepository.findById(usedPart.getId())
                     .orElseThrow(() -> new ObjectNotFoundException("Запчасть с этим id не найдена"));
+            if (usedPart.getCount() <= 0)
+                throw new IllegalArgumentException("Неверное количество запчастей");
             if (partEntity.getCount() < usedPart.getCount())
                 throw new IllegalArgumentException("Не хватает запчастей на складе");
         }
