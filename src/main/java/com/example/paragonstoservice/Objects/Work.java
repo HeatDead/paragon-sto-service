@@ -1,7 +1,6 @@
 package com.example.paragonstoservice.Objects;
 
 import lombok.Data;
-import lombok.Value;
 
 import java.util.List;
 
